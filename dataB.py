@@ -30,4 +30,3 @@ def get_binance_candle_data(symbol, interval):
     final_data_frame.set_index('Date', inplace=True)
     return final_data_frame
 
-print(get_binance_candle_data(symbol='LINKUSDT', interval=Client.KLINE_INTERVAL_1HOUR))
