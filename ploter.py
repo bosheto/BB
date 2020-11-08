@@ -21,11 +21,10 @@ trace = go.Ohlc(
     decreasing=dict(line=dict(color='red')),
 )
 
-t = go.Scatter(x=data.index[:], y=rolling_mean['data'], name='Rolling mean {} days'.format(rolling_mean['scale']), line=dict(color=rolling_mean['color']))
-    #line=dict(color='green')
-t1 = go.Scatter(x=data.index[:], y=rolling_mean_long['data'], name='Rolling mean {} days'.format(rolling_mean_long['scale']), line=dict(color=rolling_mean_long['color']))
+MA = go.Scatter(x=data.index[:], y=rolling_mean['data'], name='MA ({})'.format(rolling_mean['scale']), line=dict(color=rolling_mean['color']))
+MA1 = go.Scatter(x=data.index[:], y=rolling_mean_long['data'], name='MA ({})'.format(rolling_mean_long['scale']), line=dict(color=rolling_mean_long['color']))
 
-plot_data = [trace, t, t1]
+plot_data = [trace, MA, MA1]
 layout = {
     'title':'LINK USDT',
     'yaxis':{'title':'Price per coin'}
