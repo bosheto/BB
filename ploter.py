@@ -4,13 +4,17 @@ from datetime import datetime
 from dataB import get_binance_candle_data
 from binance.client import Client
 from indicators import MA, EMA
+from strategy import find_entry_point
 
-data = get_binance_candle_data('LINKUSDT', Client.KLINE_INTERVAL_15MINUTE, '2 day ago UTC')
+data = get_binance_candle_data('LINKUSDT', Client.KLINE_INTERVAL_1MINUTE, '2 hour ago UTC')
+
 
 rolling_mean = MA(data, 7, 'purple')
 rolling_mean_long = MA(data, 25, 'orange')
 exponential_MA = EMA(data, 7, 'cyan')
 exponetial_MA_long = EMA(data, 25, 'orange')
+
+find_entry_point(data, rolling_mean['data'], rolling_mean_long['data'])
 
 trace = go.Ohlc(
     x = data.index[:],
@@ -18,6 +22,7 @@ trace = go.Ohlc(
     high = data['High'],
     low = data['Low'],
     close = data['Close'],
+    
     name = 'LINK USDT',
     increasing=dict(line=dict(color='blue')),
     decreasing=dict(line=dict(color='red')),
@@ -39,7 +44,7 @@ exMA = go.Scatter(x=data.index[:], y=exponential_MA['data'], name= 'EMA ({})'.fo
 exMA_long = go.Scatter(x=data.index[:], y=exponetial_MA_long['data'], name= 'EMA ({})'.format(exponetial_MA_long['scale'], line=dict(color=exponetial_MA_long['color'])))
 
 
-plot_data = [candle, MA_chart, MA1_chart, exMA, exMA_long]
+plot_data = [candle, MA_chart, MA1_chart] #, exMA, exMA_long]
 layout = {
     'title':'LINK USDT',
     'yaxis':{'title':'Price per coin'}
