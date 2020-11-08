@@ -3,11 +3,18 @@ from datetime import datetime
 from pandas import DataFrame as df 
 import keys
 
-
-def get_binance_candle_data(symbol, interval):
+'''Get candle data from binance
+    Params
+    symbol : the coin pair 
+    interval : data interval
+    from_time : start time 
+'''
+def get_binance_candle_data(symbol, interval, from_time):
     client = Client(keys.Pkey, keys.Skey)
 
-    candles = client.get_klines(symbol=symbol, interval=interval  )
+    candles = client.get_historical_klines(symbol=symbol, interval=interval, start_str=from_time )
+    #candles = client.get_klines(symbol=symbol, interval=interval  )
+
 
     candles_data_frame = df(candles)
 

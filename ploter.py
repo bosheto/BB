@@ -5,7 +5,7 @@ from dataB import get_binance_candle_data
 from binance.client import Client
 from indicators import MA, EMA
 
-data = get_binance_candle_data('LINKUSDT', Client.KLINE_INTERVAL_30MINUTE)
+data = get_binance_candle_data('LINKUSDT', Client.KLINE_INTERVAL_15MINUTE, '2 day ago UTC')
 
 rolling_mean = MA(data, 7, 'purple')
 rolling_mean_long = MA(data, 25, 'orange')
