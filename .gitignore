@@ -1,3 +1,4 @@
 keys.py
 *.html
 /Charts
+/__pycache__
