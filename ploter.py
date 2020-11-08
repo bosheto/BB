@@ -1,10 +1,14 @@
 import plotly.offline as py
 import plotly.graph_objs as go
-
+from datetime import datetime
 from dataB import get_binance_candle_data
 from binance.client import Client
+from indicators import MovingAverage
 
 data = get_binance_candle_data('LINKUSDT', Client.KLINE_INTERVAL_30MINUTE)
+
+rolling_mean = MovingAverage(data, 7, 'green')
+rolling_mean_long = MovingAverage(data, 25, 'orange')
 
 trace = go.Ohlc(
     x = data.index[:],
@@ -17,7 +21,11 @@ trace = go.Ohlc(
     decreasing=dict(line=dict(color='red')),
 )
 
-plot_data = [trace]
+t = go.Scatter(x=data.index[:], y=rolling_mean['data'], name='Rolling mean {} days'.format(rolling_mean['scale']), line=dict(color=rolling_mean['color']))
+    #line=dict(color='green')
+t1 = go.Scatter(x=data.index[:], y=rolling_mean_long['data'], name='Rolling mean {} days'.format(rolling_mean_long['scale']), line=dict(color=rolling_mean_long['color']))
+
+plot_data = [trace, t, t1]
 layout = {
     'title':'LINK USDT',
     'yaxis':{'title':'Price per coin'}
@@ -25,4 +33,4 @@ layout = {
 
 fig = dict(data=plot_data, layout=layout)
 
-py.plot(fig, filename='crypto.html')
+py.plot(fig, filename='Charts\\crypto.html')
