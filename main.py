@@ -1,31 +1,28 @@
-import pandas_datareader as pd 
-import plotly.offline as py
-import plotly.graph_objs as go
-import datetime
+from datetime import datetime
+from dataB import get_binance_candle_data
+from binance.client import Client
 
-start_date = datetime.datetime(2017,1,1)
-end_date = datetime.datetime.now()
+rate = 1
 
-AAPL = pd.DataReader('AAPL', 'yahoo', start_date, end_date)
+last_update = datetime.now().minute
 
-print(AAPL.tail(10))
+def update():
+    get_binance_candle_data('LINKUSDT', Client.KLINE_INTERVAL_1MINUTE, '1 minutes ago UTC')
+    print('Update \n')
+    
+current_minute = 0
 
-trace = go.Ohlc(
-    x = AAPL.index[:],
-    open = AAPL['Open'],
-    high = AAPL['High'],
-    low = AAPL['Low'],
-    close = AAPL['Close'],
-    name = 'AAPL',
-    increasing=dict(line=dict(color='blue')),
-    decreasing=dict(line=dict(color='red')),
-)
 
-data = [trace]
-layout = {
-    'title' : 'AAPL STOCK',
-    'yaxis' : {'title': 'Price per share'}
-}
+while True:
+    time = datetime.now()
+    current_minute = time.minute
 
-fig = dict(data=data,layout=layout)
-py.plot(fig, filename='stonks.html')
+    if current_minute - rate >= last_update:  
+        update()
+        last_update = current_minute
+        isZeroMin = False
+    
+    if current_minute - rate == -rate and not isZeroMin:
+        update()
+        isZeroMin = True
+        

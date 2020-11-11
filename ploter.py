@@ -5,8 +5,9 @@ from dataB import get_binance_candle_data
 from binance.client import Client
 from indicators import MA, EMA
 from strategy import find_entry_point
+from file_manager import update_curency_file
 
-data = get_binance_candle_data('LINKUSDT', Client.KLINE_INTERVAL_1MINUTE, '2 hour ago UTC')
+data = get_binance_candle_data('LINKUSDT', Client.KLINE_INTERVAL_1MINUTE, '15 minutes ago UTC')
 
 
 rolling_mean = MA(data, 7, 'purple')
@@ -14,7 +15,7 @@ rolling_mean_long = MA(data, 25, 'orange')
 exponential_MA = EMA(data, 7, 'cyan')
 exponetial_MA_long = EMA(data, 25, 'orange')
 
-find_entry_point(data, rolling_mean['data'], rolling_mean_long['data'])
+#find_entry_point(data, rolling_mean['data'], rolling_mean_long['data'])
 
 trace = go.Ohlc(
     x = data.index[:],

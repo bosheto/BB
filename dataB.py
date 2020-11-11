@@ -35,5 +35,7 @@ def get_binance_candle_data(symbol, interval, from_time):
     final_data_frame = candles_data_frame.join(dataframe_final_date)
 
     final_data_frame.set_index('Date', inplace=True)
+    path = 'CSV\\' + symbol + '.csv'
+    final_data_frame.to_csv(path_or_buf=path, header=False, mode='a')
     return final_data_frame
 

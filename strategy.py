@@ -1,6 +1,32 @@
  
 import pandas as pd 
 import numpy as np
+import math
+import datetime
+
+tolerance = 0.0008
+
+def find_exit_point(data):
+    c = 0
+    for i in range(len(data)):
+        if i == 0:
+            continue
+
+        v = data[1]
+        t = data[0]
+        if t[i].hour < 19 and t[i].minute < 52:
+            continue
+        if v[i] < v[i-1]:
+            if (v[i] + tolerance) - v[i-1] < 0:
+            #to = datetime.datetime.fromtimestamp(t[i])
+                print(t[i])
+                break
+
+    print(c)
+
+        
+
+
 def find_entry_point(data, indicator_1, indicator_2):
 
     df = pd.DataFrame(data)
@@ -20,6 +46,7 @@ def find_entry_point(data, indicator_1, indicator_2):
                 out_l.append(s[i])
                 pl_data.append(out_l)
 
-    tf = pd.DataFrame(pl_data)                
-    print(tf)    
+    tf = pd.DataFrame(pl_data)
+    find_exit_point(tf)
+
 
