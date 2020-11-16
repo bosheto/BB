@@ -1,13 +1,13 @@
 import plotly.offline as py
 import plotly.graph_objs as go
 from datetime import datetime
-from dataB import get_binance_candle_data
+from dataB import load_binance_data_from_csv
 from binance.client import Client
 from indicators import MA, EMA
 from strategy import find_entry_point
 from file_manager import update_curency_file
 
-data = get_binance_candle_data('LINKUSDT', Client.KLINE_INTERVAL_1MINUTE, '15 minutes ago UTC')
+data = load_binance_data_from_csv('LINKUSDT')
 
 
 rolling_mean = MA(data, 7, 'purple')
@@ -53,4 +53,48 @@ layout = {
 
 fig = dict(data=plot_data, layout=layout)
 
-py.plot(fig, filename='Charts\\crypto.html')
+#py.plot(fig, filename='Charts\\crypto.html')
+
+def create_debug_chart(data, indicators, entry_positions, sell_positions):
+
+    mean = indicators[0]
+    mean_long = indicators[1]
+
+    candle = go.Candlestick(
+    x = data.index[:],
+    open = data['Open'],
+    high = data['High'],
+    low = data['Low'],
+    close = data['Close'],
+    name = 'BNB USDT',
+    )
+
+    sma_trace = go.Scatter(x=data.index[:], y =mean['data'], name='Ma ({})'.format(mean['scale']), line=dict(color=mean['color']))
+    lma_trace = go.Scatter(x=data.index[:], y =mean_long['data'], name='Ma ({})'.format(mean_long['scale']), line=dict(color=mean_long['color']))
+    
+    entry_pos = go.Scatter(
+        x=data.index[:],
+        y = entry_positions,
+        mode='markers',
+        line=dict(color='green'),
+        name='Entry points'
+
+    )
+
+    sell_point = go.Scatter(
+        x = data.index[:],
+        y = sell_positions,
+        mode='markers',
+        line=dict(color='red'),
+        name='Sell points'
+
+    )
+    plot_data = [candle, sma_trace, lma_trace, entry_pos, sell_point]
+    
+    layout = {
+        'title' : 'BNB-USDT Debug',
+        'yaxis' : {'title' : 'Price per coin'}
+    }
+
+    fig = dict(data=plot_data, layout=layout)
+    py.plot(fig, filename='Charts\\Debug.html')

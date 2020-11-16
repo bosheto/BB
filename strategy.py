@@ -14,8 +14,8 @@ def find_exit_point(data):
 
         v = data[1]
         t = data[0]
-        if t[i].hour < 19 and t[i].minute < 52:
-            continue
+        # if t[i].hour < 19 and t[i].minute < 52:
+        #     continue
         if v[i] < v[i-1]:
             if (v[i] + tolerance) - v[i-1] < 0:
             #to = datetime.datetime.fromtimestamp(t[i])
@@ -47,6 +47,40 @@ def find_entry_point(data, indicator_1, indicator_2):
                 pl_data.append(out_l)
 
     tf = pd.DataFrame(pl_data)
-    find_exit_point(tf)
+    #find_exit_point(tf)
 
 
+def golden_cross(data, indicator_1, indicator_2):
+    
+    df = pd.DataFrame(data)
+    df['MA_short'] = indicator_1
+    df['MA_long'] = indicator_2
+    s = df['MA_short']
+    l = df['MA_long']  
+    p = df['Close']
+    ep = []
+    sp = []
+    entry_position = None
+    exit_position = None
+
+
+    for i in range(len(df)):
+        
+        if s[i] > l[i] and entry_position is None:
+            ep.append(s[i])
+            entry_position = p[i] 
+            continue
+        elif s[i] < l[i] and entry_position != None:
+            entry_position = None
+                        
+        ep.append(np.nan)
+    return ep
+        
+
+def sell_point(data, indicator_1, indicator_2):
+    df = pd.DataFrame(data)
+    df['MA_short'] = indicator_1
+    df['MA_long'] = indicator_2
+    s = df['MA_short']
+    l = df['MA_long']  
+    p = df['Close']
