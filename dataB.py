@@ -55,3 +55,11 @@ def load_binance_data_from_csv(symbol):
         
         f.close()
         return data
+
+def check_for_missing_data(symbol):
+    pass
+
+def get_current_price(symbol):
+    client = Client(keys.Pkey, keys.Skey)
+    raw_price = client.get_avg_price(symbol)['price']
+    return float(raw_price)

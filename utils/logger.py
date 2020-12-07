@@ -1,4 +1,5 @@
 from datetime import datetime
+
 import os
 class Logger:
 
@@ -43,7 +44,7 @@ class AI_Logger:
         self.file.write('Volume ' + str(trade['volume']) + '\n')
         self.file.write('Sell Price ' + str(trade['sell price']) + '\n')
         self.file.write('Profit ' + str(trade['profit']) + '\n')
-        self.file.write('Profit % ' + str(trade['profit %']) + '\n')
+        self.file.write('Gain % ' + str(trade['gain %']) + '\n')
         self.file.write('Flag ' + str(trade['flag']) + '\n')
         self.file.write('\n')
         self.unload_file()
