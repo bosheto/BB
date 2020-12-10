@@ -24,12 +24,15 @@ class Trader:
         self.short_ma = None
         self.long_ma = None
         
+        self.separation = 0.0015
+
         # Trade info
         self.balance = 1000.00
         self.buy_price = 0.00
         self.sell_price = 0.00
         self.volume = 0
         self.profit = 0.00
+        
 
         # Stop loss 
         self.stop_loss_price = 0
@@ -68,7 +71,7 @@ class Trader:
             self.long_ma = self.data['Close'].rolling(window=25).mean()
            
             # Buy Coins
-            if not self.hasAssets and self.short_ma[-1] > self.long_ma[-1] and self.short_ma[-1] > self.short_ma[-2]:
+            if not self.hasAssets and self.short_ma[-1] > self.long_ma[-1] + self.separation and self.short_ma[-1] > self.short_ma[-2]:
                 self.buy_coins()
                 print('Buy order at {}'.format(self.buy_price))
                 
@@ -190,7 +193,7 @@ class Trader:
                f.write('Sell price ' + str(self.sell_price) + '\n')
                f.write('Volume ' + str(self.volume) + '\n')
                f.write('Profit ' + str(self.profit) + '\n')
-               f.write('Current balance ' + str(self.balance) + '\n\n')
+               f.write('Current balance ' + str(self.truncate(self.balance,2)) + '\n\n')
                f.close()
         else:
             with open(path, 'w') as f:
