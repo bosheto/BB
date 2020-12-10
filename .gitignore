@@ -5,3 +5,6 @@ keys.py
 /stocks
 /utils/__pycache__
 /NewLogs
+*.csv
+Logs/VersionTwo/2020-12-10.txt
+CSV/LINKUSDT.csv
