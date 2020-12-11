@@ -220,14 +220,15 @@ class Trader:
             self.hasAssets = True
             self.buy_price = current_price
             self.calculate_volume(current_price)
-            self.stop_loss_price = (self.buy_price + (current_price * 0.01)) - self.stop_loss_amount
+            self.stop_loss_price = self.buy_price  - self.stop_loss_amount
             self.buy_time = self.get_timestamp()
 
     def sell_coins(self, current_price):
         self.hasAssets = False
         self.sell_price = current_price
-        sell_price = self.truncate((self.sell_price - (self.sell_price * 0.01)), 2 )
+        sell_price = current_price
         self.balance += self.volume * sell_price
+        self.balance += self.volume * current_price
         self.profit = self.truncate((self.sell_price - self.buy_price) * self.volume, 2)
         self.sell_time = self.get_timestamp()
         print(self.get_timestamp() +'Sold at {0} with a profit of {1} \a'.format(self.sell_price, self.profit))
@@ -240,7 +241,7 @@ class Trader:
     def calculate_volume(self, price):
         volume = self.balance / price
         self.volume = int(volume)
-        price = price + (price * 0.01)
+        
         self.balance -= self.volume * price 
 
     def initialize_settings(self):
