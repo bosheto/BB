@@ -217,7 +217,7 @@ class Trader:
     def sell_coins(self, current_price):
         self.hasAssets = False
         self.sell_price = current_price
-        self.balance += self.volume * current_price
+        self.balance += self.volume * current_price - (current_price * 0.1)
         self.profit = self.truncate((self.sell_price - self.buy_price) * self.volume, 2)
         print(self.get_timestamp() +'Sold at {0} with a profit of {1} \a'.format(self.sell_price, self.profit))
         self.log_to_file()
@@ -229,6 +229,7 @@ class Trader:
     def calculate_volume(self, price):
         volume = self.balance / price
         self.volume = int(volume)
+        price = price + (price * 0.1)
         self.balance -= self.volume * price 
 
 
