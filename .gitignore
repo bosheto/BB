@@ -4,6 +4,7 @@ keys.py
 /__pycache__
 /stocks
 /utils/__pycache__
+<<<<<<< HEAD
 /NewLogs
 *.csv
 Logs/VersionTwo/2020-12-10.txt
@@ -11,3 +12,6 @@ CSV/LINKUSDT.csv
 *.csv
 CSV/LINKUSDT.csv
 CSV/LINKUSDT.csv
+=======
+/NewLogs
+>>>>>>> parent of 4d4ffcf... Update .gitignore
