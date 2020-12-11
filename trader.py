@@ -13,26 +13,28 @@ import sys
 
 class Trader:
 
-    def __init__(self, mode=0):
+    def __init__(self, symbol='',capital=0.00, mode=0, bot_id = None):
         # General stuff
         self.name = 'Trader'
-        self.version = 'a1.0'
+        self.version = 'a1.1'
         self.mode = self.validate_selected_mode(mode)
         self.data = None
         self.hasAssets = False
-        self.symbol = 'LINKUSDT'
+        self.symbol = symbol
         self.short_ma = None
         self.long_ma = None
-        
+        self.bot_id = bot_id
         self.separation = 0.0015
 
+
         # Trade info
-        self.balance = 1000.00
+        self.balance = capital
         self.buy_price = 0.00
         self.sell_price = 0.00
         self.volume = 0
         self.profit = 0.00
-        
+        self.buy_time = None
+        self.sell_time = None
 
         # Stop loss 
         self.stop_loss_price = 0
@@ -178,6 +180,7 @@ class Trader:
                 'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume']
                 data.set_index('Date', inplace=True)
                 return data             
+    
     # Util function for truncating floats 
     def truncate(self,f, n):
         '''Truncates/pads a float f to n decimal places without rounding'''
@@ -186,11 +189,13 @@ class Trader:
             return '{0:.{1}f}'.format(f, n)
         i, p, d = s.partition('.')
         return float('.'.join([i, (d+'0'*n)[:n]]))
+    
     # Log trade to file 
     def log_to_file(self):
         path = self.file_path + self.file_name + self.file_extension
         if os.path.exists(path):
            with open(path, 'a') as f:
+               f.write('{0}-{1}'.format(self.buy_time, self.sell_time))
                f.write('Trade symbol ' + str(self.symbol) + '\n')
                f.write('Buy price ' + str(self.buy_price) + '\n')
                f.write('Sell price ' + str(self.sell_price) + '\n')
@@ -215,14 +220,16 @@ class Trader:
             self.hasAssets = True
             self.buy_price = current_price
             self.calculate_volume(current_price)
-            self.stop_loss_price = self.buy_price - self.stop_loss_amount
-    
+            self.stop_loss_price = (self.buy_price + (current_price * 0.01)) - self.stop_loss_amount
+            self.buy_time = self.get_timestamp()
+
     def sell_coins(self, current_price):
         self.hasAssets = False
         self.sell_price = current_price
         sell_price = self.truncate((self.sell_price - (self.sell_price * 0.01)), 2 )
         self.balance += self.volume * sell_price
         self.profit = self.truncate((self.sell_price - self.buy_price) * self.volume, 2)
+        self.sell_time = self.get_timestamp()
         print(self.get_timestamp() +'Sold at {0} with a profit of {1} \a'.format(self.sell_price, self.profit))
         self.log_to_file()
         self.buy_price = 0.00
@@ -233,7 +240,7 @@ class Trader:
     def calculate_volume(self, price):
         volume = self.balance / price
         self.volume = int(volume)
-        price = price + (price * 0.1)
+        price = price + (price * 0.01)
         self.balance -= self.volume * price 
 
     def initialize_settings(self):
@@ -246,3 +253,7 @@ class Trader:
 
     def __get_setting_string(self, setting_name, setting_type, settings_file):
         pass
+
+
+
+    
