@@ -236,8 +236,6 @@ class Trader:
         price = price + (price * 0.1)
         self.balance -= self.volume * price 
 
-    
-
     def initialize_settings(self):
         filepath = 'Settings\\' + self.name + '.cfg'
         if os.path.exists(filepath):
