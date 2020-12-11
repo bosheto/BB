@@ -9,7 +9,7 @@ from enum import Enum
 import pandas as pd
 import os
 import random as rand
-
+import sys
 
 class Trader:
 
@@ -47,8 +47,11 @@ class Trader:
         self.update_time_short = 0
         self.update_time_long = 0
 
-        # Logging 
-        self.file_path = 'Logs\\VersionTwo\\' 
+        # Logging
+        if(sys.platform == 'win32'):
+            self.file_path = 'Logs\\VersionTwo\\' 
+        elif(sys.platform == 'linux'):
+            self.file_path = 'Logs/VersionTwo/'
         self.file_name = str(datetime.now().date())
         self.file_extension = '.txt'
 
@@ -217,7 +220,8 @@ class Trader:
     def sell_coins(self, current_price):
         self.hasAssets = False
         self.sell_price = current_price
-        self.balance += self.volume * current_price - (current_price * 0.1)
+        sell_price = self.truncate((self.sell_price - (self.sell_price * 0.01)), 2 )
+        self.balance += self.volume * sell_price
         self.profit = self.truncate((self.sell_price - self.buy_price) * self.volume, 2)
         print(self.get_timestamp() +'Sold at {0} with a profit of {1} \a'.format(self.sell_price, self.profit))
         self.log_to_file()
@@ -232,6 +236,7 @@ class Trader:
         price = price + (price * 0.1)
         self.balance -= self.volume * price 
 
+    
 
     def initialize_settings(self):
         filepath = 'Settings\\' + self.name + '.cfg'

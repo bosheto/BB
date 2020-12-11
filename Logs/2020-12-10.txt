@@ -1,0 +1,287 @@
+Trade symbol LINKUSDT
+Buy price 12.0119
+Sell price 12.0169
+Volume 83
+Profit 0.41
+Current balance 1000.41
+
+Trade symbol LINKUSDT
+Buy price 12.0169
+Sell price 12.0919
+Volume 83
+Profit 6.22
+Current balance 1006.64
+
+Trade symbol LINKUSDT
+Buy price 12.1111
+Sell price 12.1575
+Volume 83
+Profit 3.85
+Current balance 1010.49
+
+Trade symbol LINKUSDT
+Buy price 12.1575
+Sell price 12.1539
+Volume 83
+Profit -0.29
+Current balance 1010.19
+
+Trade symbol LINKUSDT
+Buy price 12.1501
+Sell price 12.152
+Volume 83
+Profit 0.15
+Current balance 1010.35
+
+Trade symbol LINKUSDT
+Buy price 12.1573
+Sell price 12.1606
+Volume 83
+Profit 0.27
+Current balance 1010.62
+
+Trade symbol LINKUSDT
+Buy price 12.1606
+Sell price 12.1535
+Volume 83
+Profit -0.58
+Current balance 1010.03
+
+Trade symbol LINKUSDT
+Buy price 12.1643
+Sell price 12.1699
+Volume 83
+Profit 0.46
+Current balance 1010.49
+
+Trade symbol LINKUSDT
+Buy price 12.1632
+Sell price 12.1565
+Volume 83
+Profit -0.55
+Current balance 1009.94
+
+Trade symbol LINKUSDT
+Buy price 12.1565
+Sell price 12.1498
+Volume 83
+Profit -0.55
+Current balance 1009.38
+
+Trade symbol LINKUSDT
+Buy price 12.0775
+Sell price 12.0742
+Volume 83
+Profit -0.27
+Current balance 1009.11
+
+Trade symbol LINKUSDT
+Buy price 12.0249
+Sell price 12.0265
+Volume 83
+Profit 0.13
+Current balance 1009.24
+
+Trade symbol LINKUSDT
+Buy price 12.0235
+Sell price 12.0224
+Volume 83
+Profit -0.09
+Current balance 1009.15
+
+Trade symbol LINKUSDT
+Buy price 12.0244
+Sell price 12.026
+Volume 83
+Profit 0.13
+Current balance 1009.28
+
+Trade symbol LINKUSDT
+Buy price 12.026
+Sell price 12.0283
+Volume 83
+Profit 0.19
+Current balance 1009.47
+
+Trade symbol LINKUSDT
+Buy price 11.6638
+Sell price 11.7026
+Volume 86
+Profit 3.33
+Current balance 1012.81
+
+Trade symbol LINKUSDT
+Buy price 11.6785
+Sell price 11.6737
+Volume 86
+Profit -0.41
+Current balance 1012.4
+
+Trade symbol LINKUSDT
+Buy price 11.6737
+Sell price 11.6632
+Volume 86
+Profit -0.9
+Current balance 1011.49
+
+Trade symbol LINKUSDT
+Buy price 11.6761
+Sell price 11.7211
+Volume 86
+Profit 3.86
+Current balance 1015.36
+
+Trade symbol LINKUSDT
+Buy price 11.6788
+Sell price 11.7474
+Volume 86
+Profit 5.89
+Current balance 1021.26
+
+Trade symbol LINKUSDT
+Buy price 11.7199
+Sell price 11.767
+Volume 87
+Profit 4.09
+Current balance 1025.36
+
+Trade symbol LINKUSDT
+Buy price 11.7233
+Sell price 11.7194
+Volume 87
+Profit -0.33
+Current balance 1025.02
+
+Trade symbol LINKUSDT
+Buy price 11.7188
+Sell price 11.7052
+Volume 87
+Profit -1.18
+Current balance 1023.84
+
+Trade symbol LINKUSDT
+Buy price 11.724
+Sell price 11.7734
+Volume 87
+Profit 4.29
+Current balance 1028.14
+
+Trade symbol LINKUSDT
+Buy price 11.7734
+Sell price 11.7856
+Volume 87
+Profit 1.06
+Current balance 1029.2
+
+Trade symbol LINKUSDT
+Buy price 11.7848
+Sell price 11.7824
+Volume 87
+Profit -0.2
+Current balance 1028.99
+
+Trade symbol LINKUSDT
+Buy price 11.7865
+Sell price 11.7885
+Volume 87
+Profit 0.17
+Current balance 1029.16
+
+Trade symbol LINKUSDT
+Buy price 11.8096
+Sell price 11.8083
+Volume 87
+Profit -0.11
+Current balance 1029.05
+
+Trade symbol LINKUSDT
+Buy price 11.7412
+Sell price 11.7885
+Volume 87
+Profit 4.11
+Current balance 1033.17
+
+Trade symbol LINKUSDT
+Buy price 11.7887
+Sell price 11.8203
+Volume 87
+Profit 2.74
+Current balance 1035.91
+
+Trade symbol LINKUSDT
+Buy price 11.8034
+Sell price 11.8157
+Volume 87
+Profit 1.07
+Current balance 1036.99
+
+Trade symbol LINKUSDT
+Buy price 11.8096
+Sell price 11.8147
+Volume 87
+Profit 0.44
+Current balance 1037.43
+
+Trade symbol LINKUSDT
+Buy price 11.8189
+Sell price 11.8181
+Volume 87
+Profit -0.06
+Current balance 1037.36
+
+Trade symbol LINKUSDT
+Buy price 11.8205
+Sell price 11.8069
+Volume 87
+Profit -1.18
+Current balance 1036.18
+
+Trade symbol LINKUSDT
+Buy price 11.8178
+Sell price 11.8425
+Volume 87
+Profit 2.14
+Current balance 1038.32
+
+Trade symbol LINKUSDT
+Buy price 11.7595
+Sell price 11.7979
+Volume 88
+Profit 3.37
+Current balance 1041.7
+
+Trade symbol LINKUSDT
+Buy price 11.7979
+Sell price 11.7894
+Volume 88
+Profit -0.74
+Current balance 1040.96
+
+Trade symbol LINKUSDT
+Buy price 11.6249
+Sell price 11.8164
+Volume 89
+Profit 17.04
+Current balance 1058.0
+
+Trade symbol LINKUSDT
+Buy price 11.6657
+Sell price 11.6759
+Volume 90
+Profit 0.91
+Current balance 1058.92
+
+Trade symbol LINKUSDT
+Buy price 11.6452
+Sell price 11.6864
+Volume 90
+Profit 3.7
+Current balance 1062.63
+
+Trade symbol LINKUSDT
+Buy price 11.6574
+Sell price 11.7
+Volume 91
+Profit 3.87
+Current balance 1066.5
+
