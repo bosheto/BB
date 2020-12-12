@@ -78,10 +78,10 @@ class Trader:
             # Buy Coins
             if not self.hasAssets and self.short_ma[-1] > self.long_ma[-1] + self.separation and self.short_ma[-1] > self.short_ma[-2]:
                 self.buy_coins()
-                print('Buy order at {}'.format(self.buy_price))
+                print('Buy order {0} at {1}'.format(self.symbol, self.buy_price))
                 
             
-            print(self.get_timestamp() + 'Canldes update')
+            print(self.get_timestamp() + 'Canldes update ' + self.symbol)
             self.buy_last_update = time()
             self.update_time_long = time() - tt
     # Find when to sell curency
@@ -98,7 +98,7 @@ class Trader:
             if current_price >= self.buy_price + self.stop_loss_update_amount:
                 self.stop_loss_price = current_price - self.stop_loss_amount
 
-            print(self.get_timestamp() + ' Sell update')
+            print(self.get_timestamp() + ' Sell update ' + self.symbol )
             self.sell_last_update = time()
             self.update_time_short = time() - tt
     # Get the current time 
@@ -195,7 +195,7 @@ class Trader:
         path = self.file_path + self.file_name + self.file_extension
         if os.path.exists(path):
            with open(path, 'a') as f:
-               f.write('{0}-{1}'.format(self.buy_time, self.sell_time))
+               f.write('{0}-{1}\n'.format(self.buy_time, self.sell_time))
                f.write('Trade symbol ' + str(self.symbol) + '\n')
                f.write('Buy price ' + str(self.buy_price) + '\n')
                f.write('Sell price ' + str(self.sell_price) + '\n')
@@ -227,11 +227,10 @@ class Trader:
         self.hasAssets = False
         self.sell_price = current_price
         sell_price = current_price
-        self.balance += self.volume * sell_price
-        self.balance += self.volume * current_price
+        self.balance += (self.volume * sell_price) * 0.98
         self.profit = self.truncate((self.sell_price - self.buy_price) * self.volume, 2)
         self.sell_time = self.get_timestamp()
-        print(self.get_timestamp() +'Sold at {0} with a profit of {1} \a'.format(self.sell_price, self.profit))
+        print(self.get_timestamp() +'Sold {2} at {0} with a profit of {1} \a'.format(self.sell_price, self.profit, self.symbol))
         self.log_to_file()
         self.buy_price = 0.00
         self.sell_price = 0.00
@@ -240,8 +239,7 @@ class Trader:
 
     def calculate_volume(self, price):
         volume = self.balance / price
-        self.volume = int(volume)
-        
+        self.volume = int(volume) 
         self.balance -= self.volume * price 
 
     def initialize_settings(self):

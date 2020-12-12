@@ -2,37 +2,41 @@ from datetime import datetime
 from dataB import get_binance_candle_data
 from binance.client import Client
 import time
-from utils.logger import AI_Logger, Logger
-from bot import Bot_AI, Bot_Daisy
 rate = 1
 from trader import Trader
 last_update = datetime.now().minute
+import argparse 
 
-t_link = Trader(symbol='LINKUSDT', bot_id=1, capital=700.00)
-t_ada = Trader(symbol='ADAUSDT', bot_id=2, capital=300.00)
+parser = argparse.ArgumentParser()
+parser.add_argument('--symbol', dest='symbol', help='symbol to trade', type=str)
+parser.add_argument('--capital',dest='capital', help='Starting capital', type=float)
+parser.add_argument('--cycle', dest='cycle', help='Cycle time', type=int)
+args = parser.parse_args()
+
+bot = Trader(symbol=args.symbol, capital=args.capital, mode=0, bot_id=1)
 
 '''Convert hours to seconds'''
 def hours_to_seconds(hours):
     return (60 * 60) * hours
 
 startup = True
-cicle_time = hours_to_seconds(6) 
+
+cicle_time = hours_to_seconds(args.cycle) 
 
 
 print('Retrieving starting data')
-get_binance_candle_data('LINKUSDT', Client.KLINE_INTERVAL_1MINUTE, '30 minutes ago UTC')
-get_binance_candle_data('ADAUSDT', Client.KLINE_INTERVAL_1MINUTE, '30 minutes ago UTC')
+get_binance_candle_data(args.symbol, Client.KLINE_INTERVAL_1MINUTE, '30 minutes ago UTC')
 print('Data retrieved. Starting:')
 
 start_time = time.time()
+
 while True:
-    if startup and not datetime.now().second == 20:
+    if startup and not datetime.now().second == 7:
         startup = False
         continue
-    t_link.update()
-    t_ada.update()
+    bot.update()
+    
     if time.time() - start_time >= cicle_time:
         break
 
 print('Cycle complete')
-
