@@ -1,8 +1,0 @@
-[1:38:51] -[1:42:52] 
-Trade symbol LINKUSDT
-Buy price 11.6831
-Sell price 11.6845
-Volume 59
-Profit 0.08
-Current balance 700.08
-

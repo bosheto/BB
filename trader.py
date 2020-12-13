@@ -16,7 +16,7 @@ class Trader:
     def __init__(self, symbol='',capital=0.00, mode=0, bot_id = None):
         # General stuff
         self.name = 'Trader'
-        self.version = 'a1.1'
+        self.version = 'a1.2'
         self.mode = self.validate_selected_mode(mode)
         self.data = None
         self.hasAssets = False
@@ -51,9 +51,9 @@ class Trader:
 
         # Logging
         if(sys.platform == 'win32'):
-            self.file_path = 'Logs\\VersionTwo\\' 
+            self.file_path = 'Logs\\' 
         elif(sys.platform == 'linux'):
-            self.file_path = 'Logs/VersionTwo/'
+            self.file_path = 'Logs/'
         self.file_name = str(datetime.now().date())
         self.file_extension = '.txt'
 
@@ -109,7 +109,7 @@ class Trader:
         else:
             return 'Backtest '
     # Get candle data and save it to a csv
-    def get_candle_data(self):
+    def get_candle_data(self, _mode='a'):
         if self.mode is 0:
             try:
                 client = Client(Pkey, Skey)
@@ -137,8 +137,11 @@ class Trader:
                 final_data_frame = candles_data_frame.join(dataframe_final_date)
 
                 final_data_frame.set_index('Date', inplace=True)
-                path = 'CSV\\' + self.symbol + '.csv'
-                final_data_frame.to_csv(path_or_buf=path, header=False, mode='a')
+                if sys.platform == 'win32':
+                    path = 'CSV\\' + self.symbol + '.csv'
+                elif sys.platform == 'linux':
+                    path = 'CSV/' + self.symbol + '.csv'
+                final_data_frame.to_csv(path_or_buf=path, header=False, mode=_mode)
                 return final_data_frame
         
             except KeyError:
@@ -158,7 +161,10 @@ class Trader:
     # Load data from a csv
     def load_binance_data_from_csv(self):
         if self.mode is  0:
-            filename = 'CSV\\' + self.symbol + '.csv'
+            if sys.platform == 'win32':
+                filename = 'CSV\\' + self.symbol + '.csv'
+            elif sys.platform == 'linux':
+                filename = 'CSV/' + self.symbol + '.csv'
             with open(filename, 'r') as f:
                 data = pd.read_csv(filename)
                 data.columns = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close Time', 'Quote asset volume', 
@@ -227,7 +233,7 @@ class Trader:
         self.hasAssets = False
         self.sell_price = current_price
         sell_price = current_price
-        self.balance += (self.volume * sell_price) * 0.98
+        self.balance += (self.volume * sell_price) 
         self.profit = self.truncate((self.sell_price - self.buy_price) * self.volume, 2)
         self.sell_time = self.get_timestamp()
         print(self.get_timestamp() +'Sold {2} at {0} with a profit of {1} \a'.format(self.sell_price, self.profit, self.symbol))
