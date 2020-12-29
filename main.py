@@ -6,6 +6,7 @@ rate = 1
 from trader import Trader
 last_update = datetime.now().minute
 import argparse 
+from data_module import DataRetriever
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--symbol', dest='symbol', help='symbol to trade', type=str)
@@ -13,7 +14,11 @@ parser.add_argument('--capital',dest='capital', help='Starting capital', type=fl
 parser.add_argument('--cycle', dest='cycle', help='Cycle time', type=int)
 args = parser.parse_args()
 
-bot = Trader(symbol=args.symbol, capital=args.capital, mode=0, bot_id=1)
+dt = DataRetriever()
+
+bot = Trader(data_retriever = dt ,symbol=args.symbol, capital=args.capital, mode=0, bot_id=1)
+
+
 
 '''Convert hours to seconds'''
 def hours_to_seconds(hours):

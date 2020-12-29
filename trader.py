@@ -10,13 +10,15 @@ import pandas as pd
 import os
 import random as rand
 import sys
+from utils import get_proper_path, percent_change
+from random import uniform as rand
 
 class Trader:
 
-    def __init__(self, symbol='',capital=0.00, mode=0, bot_id = None):
+    def __init__(self, data_retriever=None, symbol='',capital=0.00, mode=0, bot_id = None):
         # General stuff
         self.name = 'Trader'
-        self.version = 'a1.2'
+        self.version = 'a1.3a'
         self.mode = self.validate_selected_mode(mode)
         self.data = None
         self.hasAssets = False
@@ -24,8 +26,8 @@ class Trader:
         self.short_ma = None
         self.long_ma = None
         self.bot_id = bot_id
-        self.separation = 0.0015
-
+        self.separation = 0.05
+        self.dt = data_retriever
 
         # Trade info
         self.balance = capital
@@ -38,8 +40,8 @@ class Trader:
 
         # Stop loss 
         self.stop_loss_price = 0
-        self.stop_loss_amount = 0.01
-        self.stop_loss_update_amount = 0.008
+        self.stop_loss_percent = 0.1
+        self.stop_loss_update_amount = 0.15
 
         # Timer stuff
         self.slow_update = 60
@@ -50,19 +52,16 @@ class Trader:
         self.update_time_long = 0
 
         # Logging
-        if(sys.platform == 'win32'):
-            self.file_path = 'Logs\\' 
-        elif(sys.platform == 'linux'):
-            self.file_path = 'Logs/'
+        self.file_path = get_proper_path(['Logs', ''])
         self.file_name = str(datetime.now().date())
         self.file_extension = '.txt'
 
+        #Deprecated
         # Backtest
-        self.backtest_file = 'Backtests\\LINKUSDT.csv'
+        self.backtest_file = 'CSV\\ADAUSDT.csv'
         self.backtest_last_row = 30
 
     def update(self):
-        # FIXME
         self.find_exit_point()
         self.find_entry_point()
         
@@ -76,12 +75,13 @@ class Trader:
             self.long_ma = self.data['Close'].rolling(window=25).mean()
            
             # Buy Coins
-            if not self.hasAssets and self.short_ma[-1] > self.long_ma[-1] + self.separation and self.short_ma[-1] > self.short_ma[-2]:
+            if not self.hasAssets and self.short_ma[-1] > self.long_ma[-1] and percent_change(self.short_ma[-1], self.long_ma[-1]) >= self.separation   and self.short_ma[-1] > self.short_ma[-2]:
                 self.buy_coins()
                 print('Buy order {0} at {1}'.format(self.symbol, self.buy_price))
                 
             
-            print(self.get_timestamp() + 'Canldes update ' + self.symbol)
+            log_str = self.get_timestamp() + 'Canldes update ' + self.symbol
+            self.log_to_console(log_str)
             self.buy_last_update = time()
             self.update_time_long = time() - tt
     # Find when to sell curency
@@ -93,24 +93,27 @@ class Trader:
             # Sell Coins 
             if current_price < self.stop_loss_price or self.short_ma[-1] < self.short_ma[-2]:
                 self.sell_coins(current_price)
-
+           
+            
             # Update Stop loss
-            if current_price >= self.buy_price + self.stop_loss_update_amount:
-                self.stop_loss_price = current_price - self.stop_loss_amount
+            if current_price >= self.stop_loss_price * (1 - self.stop_loss_update_amount):
+                self.stop_loss_price = current_price * (1 - self.stop_loss_percent)
 
             print(self.get_timestamp() + ' Sell update ' + self.symbol )
             self.sell_last_update = time()
             self.update_time_short = time() - tt
     # Get the current time 
     def get_timestamp(self):
-        if self.mode == 0:
+        if self.mode == 0 or self.mode is 2:
             timestamp = '[{0}:{1}:{2}] '.format(str(datetime.now().hour),str(datetime.now().minute), str(datetime.now().second))
             return timestamp
         else:
             return 'Backtest '
+    
+    # FIXME remove mode selection
     # Get candle data and save it to a csv
     def get_candle_data(self, _mode='a'):
-        if self.mode is 0:
+        if self.mode is 0 or self.mode is 2:
             try:
                 client = Client(Pkey, Skey)
 
@@ -137,10 +140,7 @@ class Trader:
                 final_data_frame = candles_data_frame.join(dataframe_final_date)
 
                 final_data_frame.set_index('Date', inplace=True)
-                if sys.platform == 'win32':
-                    path = 'CSV\\' + self.symbol + '.csv'
-                elif sys.platform == 'linux':
-                    path = 'CSV/' + self.symbol + '.csv'
+                path = get_proper_path(['CSV', self.symbol + '.csv'])
                 final_data_frame.to_csv(path_or_buf=path, header=False, mode=_mode)
                 return final_data_frame
         
@@ -149,30 +149,27 @@ class Trader:
                 self.get_candle_data()
     # Get the current average price
     def get_price_data(self):
-        if self.mode is 0:
+        if self.mode is 0 or self.mode is 2:
             client = Client(Pkey, Skey)
             return self.truncate(client.get_avg_price(symbol=self.symbol)['price'], 4)
         elif self.mode is 1:
-            with open(self.backtest_file, 'r') as f:
-                lines = f.readlines()
-                x = lines[self.backtest_last_row].split(',')
-                c = rand.uniform(self.truncate(x[3], 4), self.truncate(x[2], 4))
-                return self.truncate(c, 4)
+            # with open(self.backtest_file, 'r') as f:
+            #     lines = f.readlines()
+            #     x = lines[self.backtest_last_row].split(',')
+            #     c = rand.uniform(self.truncate(x[3], 4), self.truncate(x[2], 4))
+            #     return self.truncate(c, 4)
+            pass
+    
+    # FIXME remove mode selection
     # Load data from a csv
     def load_binance_data_from_csv(self):
-        if self.mode is  0:
-            if sys.platform == 'win32':
-                filename = 'CSV\\' + self.symbol + '.csv'
-            elif sys.platform == 'linux':
-                filename = 'CSV/' + self.symbol + '.csv'
-            with open(filename, 'r') as f:
-                data = pd.read_csv(filename)
-                data.columns = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close Time', 'Quote asset volume', 
-                'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume']
-                data.set_index('Date', inplace=True)
-                
-                f.close()
-                return data
+        if self.mode is  0 or self.mode is 2:
+            filename = get_proper_path(['CSV', self.symbol + '.csv'])
+            data = pd.read_csv(filename)
+            data.columns = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close Time', 'Quote asset volume', 
+            'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume']
+            data.set_index('Date', inplace=True)
+            return data
         elif self.mode is 1:
             with open(self.backtest_file, 'r') as f:
                 lines = f.readlines()
@@ -213,9 +210,10 @@ class Trader:
             with open(path, 'w') as f:
                 f.close()
                 self.log_to_file()
+    # FIXME remove this
     # Check is selected mode valid
     def validate_selected_mode(self, mode):
-        if mode == 0 or mode == 1:
+        if mode == 0 or mode == 1 or mode == 2:
             return mode
         else:
             raise Exception('Invalid mode selceted ! \nmode 0 - live data \nmode 1 - backtest \nyou entered {}'.format(mode))
@@ -226,7 +224,7 @@ class Trader:
             self.hasAssets = True
             self.buy_price = current_price
             self.calculate_volume(current_price)
-            self.stop_loss_price = self.buy_price  - self.stop_loss_amount
+            self.stop_loss_price = self.buy_price  * (1.0 - self.stop_loss_percent)
             self.buy_time = self.get_timestamp()
 
     def sell_coins(self, current_price):
@@ -259,6 +257,125 @@ class Trader:
     def __get_setting_string(self, setting_name, setting_type, settings_file):
         pass
 
+    def log_to_console(self, string, print_last_ma=True):
+        if self.mode is 0:
+            print(string)
+        elif self.mode is 2:
+            print('DEBUG')
+            
+            if print_last_ma:
+                print('MA short= {0} : MA long= {1} dif = {2}'.format(self.short_ma[-1], self.long_ma[-1], self.get_percent_change(self.long_ma[-1], self.short_ma[-1])))
+            
+            print(string)
+            print()
+
+   
+
+# class Backtest:
+#     def __init__(self,symbol, capital, short_ma, long_ma, stop_loss_amount, stop_loss_update_amount, sepataion, get_file=False):
+#         self.capital = capital
+#         self.symbol = symbol
+#         self.short_mean = self.__form_MA_str(short_ma)
+#         self.long_mean = self.__form_MA_str(long_ma)
+#         self.stop_loss = stop_loss_amount
+#         self.update_sl = stop_loss_update_amount
+#         self.data = []
+#         self.separation = sepataion
+#         #self.strat = GoldenCross(symbol,capital,stop_loss_amount, stop_loss_update_amount,self.short_mean, self.long_mean, self.separation)
+
+#         if get_file:
+#             self.__get_data()
+#         self.__load_binance_data_from_csv()
+       
 
 
-    
+#     '''
+#         Loop through all data points 
+#     '''
+#     def run(self):
+#         for i in range(len(self.data)):
+#             pass 
+#             # Do straregy
+
+#     '''
+#         Load data from beging of backtest data to line number(index)
+#     '''
+#     def __load_data(self,index):
+#         out_list = []
+        
+#         for i in range(index):
+#             out_list.append(self.data[i])
+        
+#         data = df(out_list)
+#         mas_str = 'MA-' + str(self.short_mean)
+#         mal_str = 'MA-' + str(self.long_mean)
+#         data.columns = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close Time', 'Quote asset volume', 
+#         'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume', mas_str, mal_str]
+#         data.set_index('Date', inplace=True)
+#         return data
+
+#     #FIXME implement proper MA strings
+#     '''
+#         Get the data for a symbol from binance.com 
+#     '''
+#     def __get_data(self):
+#         try:
+#             client = Client(Pkey, Skey)
+
+#             candles = client.get_historical_klines(symbol=self.symbol, interval=KLINE_INTERVAL_1MINUTE, start_str="1 day ago UTC" )
+#             #candles = client.get_klines(symbol=symbol, interval=interval  )
+
+
+#             candles_data_frame = df(candles)
+
+#             candles_data_frame_date = candles_data_frame[0]
+
+#             final_date = []
+
+#             for time in candles_data_frame_date.unique():
+#                 readable = datetime.fromtimestamp(int(time/1000))
+#                 final_date.append(readable)
+
+#             candles_data_frame.pop(0)
+#             candles_data_frame.pop(11)
+#             candles_data_frame.columns = ['Open', 'High', 'Low', 'Close', 'Volume', 'Close Time', 'Quote asset volume', 
+#             'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume']
+#             dataframe_final_date = df(final_date)
+#             dataframe_final_date.columns = ['Date']
+#             final_data_frame = candles_data_frame.join(dataframe_final_date)
+
+#             final_data_frame.set_index('Date', inplace=True)
+            
+#             mas_str = 'MA-' + str(self.short_mean)
+#             mal_str = 'MA-' + str(self.long_mean)
+#             final_data_frame[mas_str] = final_data_frame['Close'].rolling(window=self.short_mean).mean()
+#             final_data_frame[mal_str] = final_data_frame['Close'].rolling(window=self.long_mean).mean()
+#             path = get_proper_path(['CSV', 'Backtest', self.symbol + '.csv'])
+#             final_data_frame.to_csv(path_or_buf=path, header=False, mode='w')
+#             return final_data_frame
+#         except KeyError:
+#             print('Pandas Key error retrying..')
+#             self.__get_data()
+
+
+#     '''
+#         Load data from csv file ( at class init )
+#     '''
+#     def __load_binance_data_from_csv(self):
+
+#         filename = get_proper_path(['CSV', 'Backtest', self.symbol + '.csv'])
+#         with open(filename, 'r') as f:
+#             data = []
+#             lines = f.readlines()
+#             for line in lines:
+#                 data.append(line.replace('\n', '').split(','))
+#             f.close()
+#             self.data = data
+
+#     def __form_MA_str(self, i):
+#         return 'MA-' + str(i)
+
+#     def __get_current_price(self, index):
+#         pass
+
+

@@ -1,0 +1,40 @@
+[10:43:39] -[10:50:40] 
+Trade symbol ADAUSDT
+Buy price 0.1855
+Sell price 0.1874
+Volume 539
+Profit 1.02
+Current balance 101.02
+
+[10:57:17] -[10:58:19] 
+Trade symbol LINKUSDT
+Buy price 12.1408
+Sell price 12.1425
+Volume 8
+Profit 0.01
+Current balance 100.01
+
+[10:59:17] -[11:0:18] 
+Trade symbol LINKUSDT
+Buy price 12.1404
+Sell price 12.1411
+Volume 8
+Profit 0.0
+Current balance 100.01
+
+[11:1:17] -[11:2:18] 
+Trade symbol LINKUSDT
+Buy price 12.1419
+Sell price 12.1268
+Volume 8
+Profit -0.12
+Current balance 99.89
+
+[12:2:36] -[12:13:36] 
+Trade symbol ADAUSDT
+Buy price 0.1862
+Sell price 0.1873
+Volume 537
+Profit 0.59
+Current balance 100.59
+
