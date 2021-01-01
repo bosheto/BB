@@ -40,7 +40,7 @@ def get_binance_candle_data(symbol, interval, from_time):
         #final_data_frame['MA-7'] = final_data_frame['Close'].rolling(window=7).mean()
         
         path = 'CSV\\' + symbol + '.csv'
-        final_data_frame.to_csv(path_or_buf=path, header=True, mode='w')
+        final_data_frame.to_csv(path_or_buf=path, header=False, mode='w')
         return final_data_frame
     
     except KeyError:

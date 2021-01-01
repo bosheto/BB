@@ -14,7 +14,7 @@ class DataRetriever:
     def __init__(self):
         self.client = Client(Pkey, Skey)
 
-    def get_candle_data(self, _symbol, _interval, _start_time, _end_time='now', _limit=500, _folder_path=['CSV'], _mode='a',mas=7, mal=25):
+    def get_candle_data(self, _symbol, _interval, _start_time, _end_time='now', _limit=500, _folder_path=['CSV'], _mode='a'):
         try:
                 #client = Client(Pkey, Skey)
 
@@ -43,17 +43,19 @@ class DataRetriever:
                 final_data_frame.set_index('Date', inplace=True)
                 #final_data_frame['Ma-'+str(mas)] = final_data_frame['Close'].rolling(window=mas).mean()
                 #final_data_frame['Ma-'+str(mal)] = final_data_frame['Close'].rolling(window=mal).mean()
+                
                 _folder_path.append(_symbol+'.csv')
 
                 path = get_proper_path(_folder_path)
+                
                 final_data_frame.to_csv(path_or_buf=path, header=False, mode=_mode)
                 return final_data_frame
         except KeyError:
             print('Pandas Key error retrying..')
-            self.get_candle_data(_symbol=_symbol, _interval=_interval, _start_time=_start_time, _end_time=_end_time, _limit=_limit, _folder_path=_folder_path, mas= mas, mal= mal)
+            self.get_candle_data(_symbol=_symbol, _interval=_interval, _start_time=_start_time, _end_time=_end_time, _limit=_limit, _folder_path=_folder_path, _mode=_mode)
 
 
-    def load_csv_data(self, _symbol, _file_path=[],mas=7, mal=25):
+    def load_csv_data(self, _symbol, _file_path=[]):
         _file_path.append(_symbol + '.csv')
     
         data = rcsv(get_proper_path(_file_path), header=None)
@@ -62,14 +64,15 @@ class DataRetriever:
         data.set_index('Date', inplace=True)
     
         
-        data['Ma-'+str(mas)] = data['Close'].rolling(window=mas).mean()
-        data['Ma-'+str(mal)] = data['Close'].rolling(window=mal).mean()
+        # data['Ma-'+str(mas)] = data['Close'].rolling(window=mas).mean()
+        # data['Ma-'+str(mal)] = data['Close'].rolling(window=mal).mean()
 
         return data
 
 
     def get_current_price(self, _symbol):
-        return self.client.get_avg_price(symbol=_symbol)['price']
+        
+        return float(self.client.get_avg_price(symbol=_symbol)['price'])
 
 
 

@@ -1,17 +1,11 @@
 
-from binance.client import Client
 from binance.enums import *
-from keys import Pkey, Skey
 from time import time
 from datetime import datetime
 from pandas import DataFrame as df 
-from enum import Enum
 import pandas as pd
 import os
-import random as rand
-import sys
 from utils import get_proper_path, percent_change
-from random import uniform as rand
 
 class Trader:
 
@@ -28,6 +22,8 @@ class Trader:
         self.bot_id = bot_id
         self.separation = 0.05
         self.dt = data_retriever
+        self.interval = KLINE_INTERVAL_1MINUTE
+
 
         # Trade info
         self.balance = capital
@@ -69,11 +65,13 @@ class Trader:
     def find_entry_point(self ):
         if time() - self.buy_last_update >= self.slow_update - self.update_time_long:
             tt = time()
-            self.get_candle_data()
-            self.data = self.load_binance_data_from_csv()
-            self.short_ma = self.data['Close'].rolling(window=7).mean()
-            self.long_ma = self.data['Close'].rolling(window=25).mean()
+            # self.get_candle_data()
+            # self.data = self.load_binance_data_from_csv()
+            # self.short_ma = self.data['Close'].rolling(window=7).mean()
+            # self.long_ma = self.data['Close'].rolling(window=25).mean()
            
+            self.update_data()
+
             # Buy Coins
             if not self.hasAssets and self.short_ma[-1] > self.long_ma[-1] and percent_change(self.short_ma[-1], self.long_ma[-1]) >= self.separation   and self.short_ma[-1] > self.short_ma[-2]:
                 self.buy_coins()
@@ -88,7 +86,7 @@ class Trader:
     def find_exit_point(self):
         if self.hasAssets and time() - self.sell_last_update >= self.fast_update - self.update_time_short:
             tt = time()
-            current_price = self.get_price_data()
+            current_price = self.dt.get_current_price(self.symbol)
 
             # Sell Coins 
             if current_price < self.stop_loss_price or self.short_ma[-1] < self.short_ma[-2]:
@@ -110,79 +108,12 @@ class Trader:
         else:
             return 'Backtest '
     
-    # FIXME remove mode selection
-    # Get candle data and save it to a csv
-    def get_candle_data(self, _mode='a'):
-        if self.mode is 0 or self.mode is 2:
-            try:
-                client = Client(Pkey, Skey)
+    def update_data(self):
+        self.dt.get_candle_data(self.symbol,self.interval, '1 minute ago UTC', _folder_path=['CSV'])
+        self.data = self.dt.load_csv_data(self.symbol, ['CSV'])
+        self.short_ma = self.data['Close'].rolling(window=7).mean()
+        self.long_ma =self.data['Close'].rolling(window=25).mean()
 
-                candles = client.get_historical_klines(symbol=self.symbol, interval=KLINE_INTERVAL_1MINUTE, start_str='1 minute ago UTC')
-                #candles = client.get_klines(symbol=symbol, interval=interval  )
-
-
-                candles_data_frame = df(candles)
-
-                candles_data_frame_date = candles_data_frame[0]
-
-                final_date = []
-
-                for time in candles_data_frame_date.unique():
-                    readable = datetime.fromtimestamp(int(time/1000))
-                    final_date.append(readable)
-
-                candles_data_frame.pop(0)
-                candles_data_frame.pop(11)
-                candles_data_frame.columns = ['Open', 'High', 'Low', 'Close', 'Volume', 'Close Time', 'Quote asset volume', 
-                'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume']
-                dataframe_final_date = df(final_date)
-                dataframe_final_date.columns = ['Date']
-                final_data_frame = candles_data_frame.join(dataframe_final_date)
-
-                final_data_frame.set_index('Date', inplace=True)
-                path = get_proper_path(['CSV', self.symbol + '.csv'])
-                final_data_frame.to_csv(path_or_buf=path, header=False, mode=_mode)
-                return final_data_frame
-        
-            except KeyError:
-                print('Pandas Key error retrying..')
-                self.get_candle_data()
-    # Get the current average price
-    def get_price_data(self):
-        if self.mode is 0 or self.mode is 2:
-            client = Client(Pkey, Skey)
-            return self.truncate(client.get_avg_price(symbol=self.symbol)['price'], 4)
-        elif self.mode is 1:
-            # with open(self.backtest_file, 'r') as f:
-            #     lines = f.readlines()
-            #     x = lines[self.backtest_last_row].split(',')
-            #     c = rand.uniform(self.truncate(x[3], 4), self.truncate(x[2], 4))
-            #     return self.truncate(c, 4)
-            pass
-    
-    # FIXME remove mode selection
-    # Load data from a csv
-    def load_binance_data_from_csv(self):
-        if self.mode is  0 or self.mode is 2:
-            filename = get_proper_path(['CSV', self.symbol + '.csv'])
-            data = pd.read_csv(filename)
-            data.columns = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close Time', 'Quote asset volume', 
-            'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume']
-            data.set_index('Date', inplace=True)
-            return data
-        elif self.mode is 1:
-            with open(self.backtest_file, 'r') as f:
-                lines = f.readlines()
-                data_list = []
-                for i in range(self.backtest_last_row):
-                    x = lines[i].split(',')
-                    data_list.append(x)
-                self.backtest_last_row += 1
-                data = df(data_list)
-                data.columns = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close Time', 'Quote asset volume', 
-                'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume']
-                data.set_index('Date', inplace=True)
-                return data             
     
     # Util function for truncating floats 
     def truncate(self,f, n):
@@ -219,7 +150,8 @@ class Trader:
             raise Exception('Invalid mode selceted ! \nmode 0 - live data \nmode 1 - backtest \nyou entered {}'.format(mode))
     
     def buy_coins(self):
-        current_price = self.get_price_data()
+        current_price = self.dt.get_current_price(self.symbol)
+        current_price += current_price * 0.01
         if self.balance > current_price:
             self.hasAssets = True
             self.buy_price = current_price
@@ -230,7 +162,7 @@ class Trader:
     def sell_coins(self, current_price):
         self.hasAssets = False
         self.sell_price = current_price
-        sell_price = current_price
+        sell_price = current_price + (current_price * 0.01)
         self.balance += (self.volume * sell_price) 
         self.profit = self.truncate((self.sell_price - self.buy_price) * self.volume, 2)
         self.sell_time = self.get_timestamp()
@@ -258,124 +190,31 @@ class Trader:
         pass
 
     def log_to_console(self, string, print_last_ma=True):
-        if self.mode is 0:
-            print(string)
-        elif self.mode is 2:
-            print('DEBUG')
-            
-            if print_last_ma:
-                print('MA short= {0} : MA long= {1} dif = {2}'.format(self.short_ma[-1], self.long_ma[-1], self.get_percent_change(self.long_ma[-1], self.short_ma[-1])))
-            
-            print(string)
-            print()
+        
+        print(string)
+        
 
    
+class TradeData:
 
-# class Backtest:
-#     def __init__(self,symbol, capital, short_ma, long_ma, stop_loss_amount, stop_loss_update_amount, sepataion, get_file=False):
-#         self.capital = capital
-#         self.symbol = symbol
-#         self.short_mean = self.__form_MA_str(short_ma)
-#         self.long_mean = self.__form_MA_str(long_ma)
-#         self.stop_loss = stop_loss_amount
-#         self.update_sl = stop_loss_update_amount
-#         self.data = []
-#         self.separation = sepataion
-#         #self.strat = GoldenCross(symbol,capital,stop_loss_amount, stop_loss_update_amount,self.short_mean, self.long_mean, self.separation)
+    def __init__(self):
+        self.buy_price = 0
+        self.sell_price = 0
+        self.stop_losses = []
+        self.buy_time = None
+        self.sell_time = None
+    
 
-#         if get_file:
-#             self.__get_data()
-#         self.__load_binance_data_from_csv()
-       
-
-
-#     '''
-#         Loop through all data points 
-#     '''
-#     def run(self):
-#         for i in range(len(self.data)):
-#             pass 
-#             # Do straregy
-
-#     '''
-#         Load data from beging of backtest data to line number(index)
-#     '''
-#     def __load_data(self,index):
-#         out_list = []
-        
-#         for i in range(index):
-#             out_list.append(self.data[i])
-        
-#         data = df(out_list)
-#         mas_str = 'MA-' + str(self.short_mean)
-#         mal_str = 'MA-' + str(self.long_mean)
-#         data.columns = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close Time', 'Quote asset volume', 
-#         'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume', mas_str, mal_str]
-#         data.set_index('Date', inplace=True)
-#         return data
-
-#     #FIXME implement proper MA strings
-#     '''
-#         Get the data for a symbol from binance.com 
-#     '''
-#     def __get_data(self):
-#         try:
-#             client = Client(Pkey, Skey)
-
-#             candles = client.get_historical_klines(symbol=self.symbol, interval=KLINE_INTERVAL_1MINUTE, start_str="1 day ago UTC" )
-#             #candles = client.get_klines(symbol=symbol, interval=interval  )
-
-
-#             candles_data_frame = df(candles)
-
-#             candles_data_frame_date = candles_data_frame[0]
-
-#             final_date = []
-
-#             for time in candles_data_frame_date.unique():
-#                 readable = datetime.fromtimestamp(int(time/1000))
-#                 final_date.append(readable)
-
-#             candles_data_frame.pop(0)
-#             candles_data_frame.pop(11)
-#             candles_data_frame.columns = ['Open', 'High', 'Low', 'Close', 'Volume', 'Close Time', 'Quote asset volume', 
-#             'Number of trades', 'Taker buy base asset volume', 'Taker buy quote asset volume']
-#             dataframe_final_date = df(final_date)
-#             dataframe_final_date.columns = ['Date']
-#             final_data_frame = candles_data_frame.join(dataframe_final_date)
-
-#             final_data_frame.set_index('Date', inplace=True)
-            
-#             mas_str = 'MA-' + str(self.short_mean)
-#             mal_str = 'MA-' + str(self.long_mean)
-#             final_data_frame[mas_str] = final_data_frame['Close'].rolling(window=self.short_mean).mean()
-#             final_data_frame[mal_str] = final_data_frame['Close'].rolling(window=self.long_mean).mean()
-#             path = get_proper_path(['CSV', 'Backtest', self.symbol + '.csv'])
-#             final_data_frame.to_csv(path_or_buf=path, header=False, mode='w')
-#             return final_data_frame
-#         except KeyError:
-#             print('Pandas Key error retrying..')
-#             self.__get_data()
-
-
-#     '''
-#         Load data from csv file ( at class init )
-#     '''
-#     def __load_binance_data_from_csv(self):
-
-#         filename = get_proper_path(['CSV', 'Backtest', self.symbol + '.csv'])
-#         with open(filename, 'r') as f:
-#             data = []
-#             lines = f.readlines()
-#             for line in lines:
-#                 data.append(line.replace('\n', '').split(','))
-#             f.close()
-#             self.data = data
-
-#     def __form_MA_str(self, i):
-#         return 'MA-' + str(i)
-
-#     def __get_current_price(self, index):
-#         pass
-
+    def debug(self):
+        print('Buy Price')
+        print(self.buy_price)
+        print('\nSell Price')
+        print(self.sell_price)
+        print('\nStop loss amounts')
+        for i in self.stop_losses:
+            print(i)
+        print('\nBuy Time')
+        print(self.buy_time)
+        print('\nSell Time')
+        print(self.sell_time)
 

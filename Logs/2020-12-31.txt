@@ -1,0 +1,32 @@
+[11:58:22] -[11:59:23] 
+Trade symbol XRPUSDT
+Buy price 0.216
+Sell price 0.2159
+Volume 462
+Profit -0.04
+Current balance 99.95
+
+[14:39:2] -[14:46:3] 
+Trade symbol XRPUSDT
+Buy price 0.22
+Sell price 0.22091934
+Volume 454
+Profit 0.41
+Current balance 100.41
+
+[15:34:57] -[15:38:57] 
+Trade symbol XRPUSDT
+Buy price 0.2156258999
+Sell price 0.2139641
+Volume 463
+Profit -0.76
+Current balance 100.22
+
+[15:39:57] -[15:49:57] 
+Trade symbol XRPUSDT
+Buy price 0.2161485749
+Sell price 0.21476462
+Volume 463
+Profit -0.64
+Current balance 100.57
+
